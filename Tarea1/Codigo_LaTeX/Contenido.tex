@@ -1,0 +1,270 @@
+\documentclass[12pt]{article}
+
+\input{Librerias.tex}
+
+\title{{\huge \textbf{Representación de redes a través de la teoría de grafos}}}
+\author{Mario Alberto Gutiérrez Carrales}								%Datos de encabezado
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+En este reporte se desarrolla una investigación teórica acerca de las redes debido a que son de vital importancia ya que en el mundo se presenta una gran diversidad de problemas que pueden ser modelados a través de una red, de hecho, la existencia de las redes es tan relevante que la teoría de grafos \cite{grafos} se encarga de estudiar sus propiedades.
+
+Utilizando ésta teoría se pretende estructurar las propiedades de algunos grafos y además con la ayuda del lenguaje de programación interpretado \texttt{python} \cite{python} se desean construir ejemplos que ayuden a visualizar de forma sencilla cada grafo.
+
+En el código se utilizaron dos módulos, uno de ellos es NetworkX \cite{networkx}, que contiene estructura de datos que almacena grafos y el otro Matplotlib \cite{matplotlib} que permite visualizar y guardar imágenes en formato eps.
+
+El uso de dichos módulos va declarado al inicio del código, tal como se muestra a continuación: 
+
+\lstinputlisting[firstline=7, lastline=9]{Ejemplo1.py} \label{codigo}
+
+Antes de comenzar con la descripción de varios tipos de grafos se presentan algunas definiciones preliminares que son necesarias.
+
+\newpage
+\section*{Definiciones preliminares}
+Un \textcolor{blue}{grafo} G es una tripleta G=(V,E,$\delta$), donde V representa el conjunto de puntos llamados vértices (o nodos), E es el conjunto de arcos llamados aristas (o lados) y $\delta$: E $\rightarrow$ V $\times$ V una función que asigna a cada arista e $\in$ E  un par de vértices u,v $\in$ V, en muchas ocasiones la función $\delta$ viene implícita en el dibujo del grafo.
+ 
+Un \textcolor{blue}{grafo simple} es aquel que entre cualquer pareja de vértices existe a lo más una arista que los une, en caso contrario se dice que es un \textcolor{blue}{multigrafo}.
+
+Se dice que un grafo es \textcolor{blue}{no dirigido} si no se toma en cuenta el orden en que los aristas se asignan a los pares de vértices es decir (v$_i$,v$_j$)=(v$_j$,v$_i$) $\forall$ v$_j$,v$_i$ $\in$ V , en caso contrario, es decir, si no se tiene la igualdad en alguna pareja de vértices se dice que es un grafo \textcolor{blue}{dirigido}.
+
+Si en un grafo se puede encontrar una lista de vértices conectados de tal manera que el primer vértice y el último sean el mismo entonces se dice que es un grafo \textcolor{blue}{cíclico}, si un grafo no es cíclico entonces se dice que es \textcolor{blue}{acíclico}.
+
+Un grafo \textcolor{blue}{reflexivo} es aquel en el que al menos un vertice tiene un arista que lo conecta consigo mismo.
+
+Es fácil determinar el tipo de grafo que se tiene haciendo uso de la matriz de multiplicidad para multigrafos y adyacencia para grafos simples, por un lado si se desea saber si un grafo es dirigido basta con verificar que se cumpla que la matriz correspondiente sea simetrica, por otra parte para confirmar si un grafo es reflexivo es suficiente observar la diagonal principal de la matriz y verificar si hay un valor distinto de 0.
+
+Es posible combinar varias propiedades, obteniendo asi diferentes tipos de grafos como se muestran en las siguientes secciones.
+
+\textbf{\textcolor{red}{NOTA:}}  En los siguientes ejemplos se utilizan aristas \textcolor{blue}{azules} para hacer referencia a que hay múltiples aristas entre 2 vértices. Se utilizan nodos \textcolor{ForestGreen}{verdes} para indicar que un nodo es reflexivo y tiene un lazo, en cambio un nodo \textcolor{red}{rojo} no hace referencia a algo en especial.
+
+\newpage
+\section{Grafo simple no dirigido acíclico}
+Un modelo aplicado que se puede llevar a cabo con este tipo de grafos son las semifinales de un torneo de fútbol, tal como se muestra en la figura \ref{fig.1}.
+
+\vspace{.6cm}
+\lstinputlisting[firstline=10, lastline=20]{Ejemplo1.py}
+
+\vspace{-.7cm}
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.45]{Ejemplo1.eps}
+  \end{center}
+   \vspace{-1cm}
+  \caption{{\small Seminifinales de torneo de fútbol}}
+  \label{fig.1}
+\end{figure}
+
+Cuando en este grafo hay una manera de llegar entre cada pareja de vértices se le conoce como árbol, por la forma parecida a un árbol real en como se van desprendiendo las aristas. 
+
+Otras aplicaciones de este tipo de grafo son los organigramas en general, distribución de bienes, árboles genealógicos, isomeros de cadena, etc.
+
+
+\newpage
+\section{Grafo simple no dirigido cíclico}
+Una de las aplicaciones más utilizadas hoy en dia que se basan en este tipo de grafo es la representación de usuarios de una red social como Facebook \cite{facebook}, Twitter \cite{twitter}, etc. así como se observa en la figura \ref{fig.2}.
+
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=21]{Ejemplo2.py}
+
+\vspace{-.5cm}
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo2.eps}
+  \end{center}
+   \vspace{-1cm}
+  \caption{{\small Usuarios en una red social}}
+  \label{fig.2}
+\end{figure}
+
+Otra aplicación importante es la modelación de territorios y de ahí surge uno de los problemas más importantes dentro de la optimización matemática que es el problema de la ruta más corta. (Considerando que todas las calles, avenidas ó carreteras son de doble sentido).
+
+
+\newpage
+\section{Grafo simple no dirigido reflexivo}
+Este grafo se encuentra presente en la forma en como están construidos ciertos cruces de avenidas en diferentes ciudades, de tal manera que las avenidas son perpendiculares entre sí y en medio se encuentra un retorno, que representa un lazo en el grafo, y su objetivo es cambiar la orientación en la que se dirige el automovilista. Observar figura \ref{fig.3}. 
+
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=22]{Ejemplo3.py}
+
+\vspace{-.7cm}
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.6]{Ejemplo3.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Conexión entre avenidas y un retorno}}
+  \label{fig.3}
+\end{figure}
+
+
+\newpage
+\section{Grafo simple dirigido acíclico}
+Algunas de las principales aplicaciones de los grafos dirigidos es la modelación de redes de transporte, cadenas de suministro, organigramas con dirección, etc. 
+
+Supongamos que el dueño de una empresa quiere llevar a cabo un proyecto, el reparto de actividades se distribuye jerárquicamente como se muestra en la figura \ref{fig.4}.
+
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=23]{Ejemplo4.py}
+
+\vspace{-.7cm}
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo4.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Jerarquía en planeación de un proyecto}}
+  \label{fig.4}
+\end{figure}
+
+
+\newpage
+\section{Grafo simple dirigido cíclico}
+En muchas ocasiones el tráfico vehicular se ve afectado por diversos factores haciendo que este sea lento, debido a ello en muchas calles solamente se permite el acceso en un solo sentido. La figura \ref{fig.5} muestra un ejemplo del tránsito vehicular en una cierta localidad. 
+
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=23]{Ejemplo5.py}
+
+
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo5.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Calles con sentido restringido}}
+  \label{fig.5}
+\end{figure}
+
+
+\newpage
+\section{Grafo simple dirigido reflexivo}
+En un modelo matemático se desea contemplar tantas características reales mientras sea posible para lograr entender un fenómeno, en este caso es posible mezclar la condición de un grafo dirigido que contenga un lazo tal como se observó en la sección 3, y un ejemplo de esto es el como están hechas ciertas colonias en algunos países en el que suele haber una calle en la esquina de una localidad y es acompañada de un retorno o parque para facilitar la salida vehicular. En la figura \ref{fig.6} se muestra un ejemplo de esta situación.
+
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=24]{Ejemplo6.py}
+
+
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo6.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Colonia}}
+  \label{fig.6}
+\end{figure}
+
+
+\newpage
+\section{Multigrafo no dirigido acíclico}
+En redes, un multigrafo es aquel que conecta algún par de vértices de múltiples maneras, esto hace que nuestro objeto de estudio sea más completo ya que en la mayoria de los casos esta herramienta es muy útil en la modelación. Un ejemplo de este grafo es una fábrica que produce productos y los suministra a diferentes almacénes pero los vehículos pueden transitar no solamente por una carretera, sino por múltiples, en este caso 2. Ver figura \ref{fig.7}.
+
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=23]{Ejemplo7.py}
+
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo7.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Ruta de un almacén}}
+  \label{fig.7}
+\end{figure}
+
+
+\newpage
+\section{Multigrafo no dirigido cíclico}
+Este tipo de grafo se ve relacionado en general en la modelación donde se vean involucrados puentes. Una característica resaltante de este grafo es que se puede llegar a cualquier vértice por la conexión de las aristas. De ésto surge el prolema particular de los 7 puentes de Konigsberg. En la figura \ref{fig.8} se muestra un ejemplo.
+
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=23]{Ejemplo8.py}
+
+
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo8.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Puentes de una ciudad}}
+  \label{fig.8}
+\end{figure}
+
+
+\newpage
+\section{Multigrafo no dirigido reflexivo}
+Sitúandonos en la sección 6, se puede extender el modelo de una colonia en la que la salida a una avenida puede estar dada por múltiples formas y no solo a la avenida, es decir, no solo un arista puede ser múltiple, sino varios. y además, puede considerarse múltiples lazos en la calle que funge el papel del nodo reflexivo, esto puede verse como un parque, callejón, retorno, etc. En la figura \ref{fig.9} se muestra un ejemplo.
+
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=24]{Ejemplo9.py}
+
+
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo9.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Colonia con múltiples conexiones}}
+  \label{fig.9}
+\end{figure}
+
+
+\newpage
+\section{Multigrafo dirigido acíclico}
+
+Supongamos que se quiere llegar de una localidad a otra y se conocen los posibles caminos por los cuales se puede transitar y se desea encontrar la ruta que contenga menor costo para llevar a cabo el viaje. Dicho problema es el de la ruta más corta y este grafo puede modelarlo adecuadamente, así como se muestra en la figura \ref{fig.10}.
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=23]{Ejemplo10.py}
+
+
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo10.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Mapa transitorio}}
+  \label{fig.10}
+\end{figure}
+
+
+\newpage
+\section{Multigrafo dirigido cíclico}
+Este tipo de grafo es el que mejor modela los problemas de ruteo de vehículos, pues cuando estamos en alguna localidad siempre podemos llegar de nuevo a ella misma utilizando otras calles que, en ocasiones, se tiene la opción de elegir una entre varias calles para llegar a una localidad y también existe la posibilidad de que cualquier calle sea de un solo sentido. En la figura \ref{fig.11} se encuentra un ejemplo de este planteamiento. 
+
+\vspace{.6cm}
+\lstinputlisting[firstline=11, lastline=24]{Ejemplo11.py}
+
+
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo11.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Calles principales de una ciudad}}
+  \label{fig.11}
+\end{figure}
+
+
+\newpage
+\section{Multigrafo dirigido reflexivo}
+Un ejemplo aplicado de este tipo de grafo es la conectividad de cables y circuitos en una computadora, tanto los cables entrantes como por ejemplo los de encender y de internet, los circuitos mismos en el cpu, y los cables de salida como teclado, mouse, etc. Dicha representación de la red computacional se encuentra en la figura \ref{fig.12}.
+
+\vspace{.6cm}
+\lstinputlisting[firstline=4, lastline=17]{Ejemplo12.py}
+
+
+\begin{figure}[H]
+  \begin{center}   
+      \includegraphics[scale=.5]{Ejemplo12.eps}
+  \end{center}
+  \vspace{-1cm}
+  \caption{{\small Red de conexión computacional}}
+  \label{fig.12}
+\end{figure}
+
+
+\newpage
+\bibliographystyle{unsrt}
+\bibliography{Referencias}
+
+\end{document}
