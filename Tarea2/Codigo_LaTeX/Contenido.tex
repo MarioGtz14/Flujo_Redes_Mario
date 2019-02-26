@@ -1,0 +1,274 @@
+\documentclass[12pt]{article}
+
+\input{Librerias.tex}
+
+\title{{\huge \textbf{Visualización de grafos}}}
+\author{Mario Alberto Gutiérrez Carrales \\ 9273}								%Datos de encabezado
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introducción}
+Este reporte está enfocado en la visualización de grafos mediante distintos algoritmos de acomodo que brinda \texttt{python} \cite{python} en sus diferentes módulos. 
+
+Cuando recién se comienzan a usar los grafos que la librería Networkx ofrece, el usuario puede enfrentarse a situaciones como tener que posicionar los nodos para visualizar la representación de la red, justo como se observó en la tarea 1 \cite{Mario}. Ante esta problemática y otras que pudieran existir, se proponen los algoritmos de acomodo (inglés: layout) que su objetivo es representar un grafo con ciertas características de la mejor manera visualmente posible, cabe destacar que en este caso se mostrará un algoritmo para cada ejemplo realizado en la práctica anterior.
+
+Antes de comenzar con los ejemplos resulta interesante mencionar los aspectos computacionales que pudieran ser más relevantes o retadores en la codificación.
+
+\newpage
+\section*{Aspectos computacionales}
+
+Se puede comenzar por describir las librerías que se utilizan para obtener exitosamente las representaciones de cada uno de los grafos, las cuales son \textcolor{blue}{\textbf{NetworkX}} \cite{networkx}, \textcolor{blue}{\textbf{Matplotlib}} \cite{matplotlib} y \textcolor{blue}{\textbf{PyGraphviz}}\cite{Pygr}. 
+
+La primera proporciona los elementos que un grafo puede tener, como su estructura tanto de nodos como aristas. La segunda proporciona visualizaciones tanto en la consola como para guardar imágenes en el formato \textcolor{red}{\textit{eps}} que fue el que se utilizó para la obtención de las figuras. Por último, cabe mencionar que la primer librería mencionada en este apartado a pesar de ser muy extensa, puede complementarse con algunas otras en el manejo de los grafos y especialmente en los algoritmos de acomodo, esta es una de las principales funciones de la tercer librería.
+
+En cualquier lenguaje de programación se puede ver que hay partes repetitivas tales como librerías, impresiones, declaración de variables, etcétera y en python no es la excepción, así que con el objetivo de evitar fragmentos de códigos repetitivos se muestran inicialmente las partes que pueden presentarse con mayor frecuencia.  
+
+\renewcommand{\lstlistingname}{Código}
+
+\vspace{.4cm}
+\captionof{lstlisting}{Librerías usadas para la visualización de grafos}
+\lstinputlisting[firstline=1, lastline=3]{2_1.py} \label{cod.1}
+
+\vspace{.4cm}
+\captionof{lstlisting}{Quitar ejes y guardar el grafo en una imagen en formato eps}
+\lstinputlisting[firstline=18, lastline=20]{2_1.py} \label{cod.2}
+
+\vspace{.4cm}
+En el código \ref{cod.1} se muestran las librerías utilizadas y en el \ref{cod.2} como guardar una imagen en formato eps. 
+
+\newpage
+Otro aspecto que más que repetitivo es tedioso, es cuando se pretende guardar una imagen, pero debido a las dimensiones del grafo se cortan los márgenes y se pierden información visual. Una manera de evitar esta situación está dada en el código \ref{cod.3}. 
+
+\vspace{.4cm}
+\captionof{lstlisting}{Agrandar márgenes}
+\lstinputlisting[firstline=16, lastline=22]{2_10.py} \label{cod.3}
+\noindent{\hspace{3.5cm} \textit{Extraído de stackoverflow.com}}
+
+\vspace{.4cm}
+En diversas versiones de python se presentan dificultades para trabajar con la librería pygraphviz como solución alterna se propone el uso de la versión web de colab de google, disponible en: \url{https://colab.research.google.com/notebooks/welcome.ipynb}
+
+\vspace{.4cm}
+Para tratar de brindar la mayor uniformidad posible a las representaciones visuales, se utilizan arcos \textbf{negros} para indicar una arista simple, arcos \textcolor{red}{\textbf{rojos}} a aquellos aristas que contienen múltiples aristas, nodos \textcolor{blue}{\textbf{azules}} que indican un nodo simple, y nodo \textcolor{green}{\textbf{verde}} para aquellos que tienen un lazo. \\
+
+Se puede observar inicialmente que cada grafo puede ser representado visualmente de manera aceptable por más de un algoritmo, la elección entre algoritmo - grafo fue de acuerdo simplemente con que el dibujo realmente representara la situación de la que se está tratando.
+
+
+
+
+\newpage
+\section{Spectral}
+Este grafo representa las eliminatorias de un torneo de futbol. Se constan de 4 semifinalistas, de los cuales solamente 2 pasan a la siguiente fase y uno de ellos es quien queda campeón. El algoritmo que brinda una mejor representacion es el spectral layout, se puede programar como se muestra en el código \ref{cod.4} y el resultado de la visualización se muestra en la figura \ref{fig:g1}.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Spectral layout}
+\lstinputlisting[firstline=5, lastline=16]{2_1.py} \label{cod.4}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{Ejemplo1.eps}
+\caption{Semifinales de torneo de futbol}
+\label{fig:g1}
+\end{figure}
+
+Se observa que la representación visual es bastante buena debido a la característica de árbol que esta situacion exige, otro algoritmo que pudo haber sido considerado es el bipartite layout.
+
+
+\newpage
+\section{Bipartite}
+
+Una de las aplicaciones más utilizadas hoy en dia es la representación de usuarios de una red social como Facebook, en ocasiones combiene saber dicha relación por género.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Bipartite layout}
+\lstinputlisting[firstline=4, lastline=14]{2_2.py} \label{cod.5}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{Ejemplo2.eps}
+\caption{Relación de amistad por género}
+\label{fig:g2}
+\end{figure}
+
+Como la situación está dada por género esto índica directamente a una partición del grafo en 2 secciones lo cual da la intuición que no hay mejor representación que la que se utilizó.
+
+
+\newpage
+\section{Random}
+
+Este ejemplo se basa en como están construidos ciertos cruces de avenidas en diferentes ciudades, de tal manera que las avenidas son perpendiculares entre sí y en medio se encuentra un retorno, que representa un lazo en el grafo, y su objetivo es cambiar la orientación en la que se dirige el automovilista. Observar figura \ref{fig:g3}.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Random layout}
+\lstinputlisting[firstline=4, lastline=17]{2_3.py} \label{cod.6}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{Ejemplo3.eps}
+\caption{Conexión entre avenidas y un retorno}
+\label{fig:g3}
+\end{figure}
+
+A pesar de que la representación es aceptable, no podemos decir que este algoritmo sea muy bueno, ya que así como un algoritmo random da una buena solución puede no darla, de hecho, si el código se corre varias veces, se obtienen diferentes versiones representativas, por lo que una vez hallado un dibujo que satisfaga al usuario, conserve la imagen con precaución.
+
+\newpage
+\section{Circular}
+
+En muchas ocasiones el tráfico vehicular se ve afectado por diversos factores haciendo que este sea lento, debido a ello en muchas calles solamente se permite el acceso en un solo sentido, así como se muestra en la figura \ref{fig:g5}.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Circular layout}
+\lstinputlisting[firstline=4, lastline=12]{2_5.py} \label{cod.8}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{Ejemplo5.eps}
+\caption{Calles con sentido restringido}
+\label{fig:g5}
+\end{figure}
+
+La visualización que se obtuvo es realmente buena, ya que con la posición de los nodos y la introducción de etiquetas da una mejor representación de la realidad.
+
+\newpage
+\section{Pydot}
+
+Es importante modelar el como están hechas ciertas colonias en algunos países en el que suele haber una calle en la esquina de una localidad y es acompañada de un retorno o parque para facilitar la salida vehicular. En la figura \ref{fig:g6} se muestra un ejemplo de esta situación.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Pydot layout}
+\lstinputlisting[firstline=5, lastline=14]{2_6.py} \label{cod.9}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{Ejemplo6.eps}
+\caption{Colonia}
+\label{fig:g6}
+\end{figure}
+
+.
+
+\newpage
+\section{Shell}
+
+Una fábrica que produce productos y los suministra a diferentes almacénes pero los vehículos pueden transitar no solamente por una carretera, sino por múltiples, en este caso 2. Ver figura \ref{fig:g7}.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Shell layout}
+\lstinputlisting[firstline=5, lastline=14]{2_7.py} \label{cod.10}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{Ejemplo7.eps}
+\caption{Ruta de un almacén}
+\label{fig:g7}
+\end{figure}
+
+Este tipo de situación es de alta exigencia ya que en la práctica no se cuentan con pocos nodos, sino una gran cantidad y algo que puede considerarse es sustituir los nodos por las fotografías de las sucursales.
+
+\newpage
+\section{Fruchterman reingold}
+
+Un problema interesante en la práctica es donde se ven involucrados puentes. Una característica resaltante de este grafo es que se puede llegar de un vértice a cualquier otro por la conexión de las aristas.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Fruchterman reingold layout}
+\lstinputlisting[firstline=4, lastline=14]{2_8.py} \label{cod.11}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{Ejemplo8.eps}
+\caption{Puentes de una ciudad}
+\label{fig:g8}
+\end{figure}
+
+Difícilmente los puentes tienen esta estructura, más bien son paralelos entre sí, pero esta representación puede ayudar en el caso en que se desea realizar un análisis para algún recorrido (como el problema de los 7 puentes).
+
+\newpage
+\section{Graphviz}
+
+Supóngase que en una colonia privada se tiene la libertad de transitar libremente por cualquier calle, donde al fondo hay un parque y este está en una calle que empieza y termina donde mismo, y además se puede obtener acceso a la avenida principal mediante dos calles. La figura \ref{fig:g9} representa esta situación.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Graphviz layout}
+\lstinputlisting[firstline=4, lastline=14]{2_9.py} \label{cod.12}
+
+\vspace{-.4cm}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{Ejemplo9.eps}
+\caption{Colonia con múltiples conexiones}
+\label{fig:g9}
+\end{figure}
+
+En la práctica cada colonia tiene su forma particular, pero esta representación es suficiente para lograr percibir la idea de la estructura de muchas colonias, así que para este ejemplo basta con esta representación.
+
+\newpage
+\section{Kamada kawai}
+
+Se desea llegar de una localidad a otra y se conocen los posibles caminos por los cuales se puede transitar y se desea encontrar la ruta que contenga menor costo para llevar a cabo el viaje.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Kamada kawai layout}
+\lstinputlisting[firstline=5, lastline=13]{2_10.py} \label{cod.13}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{Ejemplo10.eps}
+\caption{Mapa transitorio}
+\label{fig:g10}
+\end{figure}
+
+La función de los grafos que representan redes de carreteras son más buenos por la información con la que pueden contar como etiquetas o pesos que por la visualizacion en sí, así que casi cualquier algoritmo de acomodo podría ser bueno para esta situación. Para este tipo de problema se puede proponer como trabajo a futuro el representar las carreteras sobre mapas.
+
+\newpage
+\section{Spring}
+
+Los problemas de ruteo de vehículos son de gran relevancia pues tienen muchas aplicaciones, dado que se puede modelar mediante un multigrafo dirigido ciclico por sus características físicas, se puede modelar como se muestra en la figura \ref{fig:g11}.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Spring layout}
+\lstinputlisting[firstline=4, lastline=12]{2_11.py} \label{cod.14}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{Ejemplo11.eps}
+\caption{Calles principales de una ciudad}
+\label{fig:g11}
+\end{figure}
+
+El algoritmo empleado para este grafo se aplica muy bien ya que trata de esparcir todos los nodos de forma equitativa dentro de un área, y dependiendo del número de nodos. 
+
+\newpage
+\section{Force atlas 2}
+La conectividad de cables y circuitos en una computadora, tanto los cables entrantes como por ejemplo los de encender y de internet, los circuitos mismos en el cpu, y los cables de salida como teclado, mouse, etc. Dicha representación de la red computacional se encuentra en la figura \ref{fig:g12}.
+
+\vspace{.4cm}
+\captionof{lstlisting}{Force atlas layout}
+\lstinputlisting[firstline=8, lastline=25]{2_12.py} \label{cod.15}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.3]{Ejemplo12.eps}
+\caption{Red de conexión computacional}
+\label{fig:g12}
+\end{figure}
+
+\newpage
+Este algoritmo proporciona una buena representación, el único detalle es que las aristas están muy largas, provocando que el grafo sea extenso si se empiezan a considerar mayor cantidad de nodos.
+
+\bibliographystyle{unsrt}
+\bibliography{Referencias}
+
+\end{document}
