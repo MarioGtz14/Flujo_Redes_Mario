@@ -1,0 +1,295 @@
+\documentclass[12pt]{article}
+
+\input{Librerias.tex}
+
+\title{\huge{\textbf{Medición de tiempo de ejecución}}}
+\author{Mario Alberto Gutiérrez Carrales}
+\date{\today}
+
+\renewcommand{\lstlistingname}{Código}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introducción}
+Esta práctica está enfocada en los algoritmos de optimización que la librería \texttt{NetworkX} \cite{Net} ofrece. En el repositorio de dicha librería se encuentra disponible documentación gratuita que ayuda al usuario a manipular grafos, creándolos, ubicándolos y no menos importante optimizando problemas de flujo en redes en ellos.
+
+Cuando se aplica un algoritmo a un problema de optimización es importante conocer varios aspectos que permiten saber el funcionamiento de dicho algoritmo. El principal aspecto de interés es saber si se brinda la solución óptima, y después de eso, el tiempo que le toma al algoritmo para obtenerla, a este tiempo se le conoce como tiempo de ejecución. 
+
+En la versión 2.2 de \texttt{NetworkX} se encuentran más de 50 algoritmos, de los cuales, en esta práctica se trabajará con 5 de ellos, dándose a conocer en las siguientes secciones.
+
+\newpage
+\section*{Aspectos computacionales}
+Para llevar a cabo la experimentación se utiliza \texttt{python} \cite{Python} y para poder utilizar las funciones requeridas se necesitan las siguientes librerías:
+
+\begin{enumerate}
+\item \texttt{NetworkX}. Como se mencionó anteriormente, esta librería es de gran ayuda para la manipulación de grafos.
+
+\item \texttt{Matplotlib} \cite{Mat}. Esta librería contiene funciones que sirven para visualizar gráficas y guardar imágenes en distintos formatos, en particular el eps.
+ 
+\item \texttt{Time} \cite{PythonHow}. Contiene la función que determina el tiempo (en segundos) que uno o varios procesos tardan, dicho tiempo se calcula con una diferencia entre el tiempo inicial y el final.
+
+\item \texttt{Numpy} \cite{Num}. Entre las funciones que proporciona esta librería, se encuentra aquella que calcula la media y desviación estándar de una lista, en este caso será necesaria para calcular tiempos promedios y desviaciones estándar entre los tiempos de algoritmos. 
+\end{enumerate}
+
+\vspace{-.2cm}
+En el código \ref{c1} se observa como se mandan llamar las librerias dentro del editor de texto, en el \ref{c2} como se guardan las imágenes en formato \textit{eps} y en el \ref{c3} como se hacen más grandes los bordes de la imagen para evitar que se corten los margenes de la imagen.
+
+\vspace{.1cm}
+\captionof{lstlisting}{Librerías usadas para la experimentación} \label{c1}
+\lstinputlisting[firstline=1, lastline=4]{Entregable.py}
+
+\vspace{.1cm}
+\captionof{lstlisting}{Guardar imágenes en formato \textit{eps}} \label{c2}
+\lstinputlisting[firstline=94, lastline=94]{Entregable.py} 
+
+\newpage
+\captionof{lstlisting}{Aumentar bordes para evitar cortes en el grafo} \label{c3}
+\lstinputlisting[firstline=83, lastline=90]{Entregable.py}
+
+\vspace{.2cm}
+El objetivo de la experimentación es realizar una comparación entre los tiempos que un algoritmo puede tardar para resolver un problema en distintas redes, para eso, se utiliza una laptop con sistema operativo de 64 bits y un procesador AMD A9-9410 RADEON R5, 5 COMPUTE CORES 2C+3G 2.90 GHz. \\
+
+Dado que los algoritmos cuentan con una eficiencia muy potente en cuanto a tiempo cuando se resuelve una instancia pequeña, se recurre a utilizar 75,000 repeticiones y asi obtener tiempos no nulos.\\
+
+La metodología a seguir para cada algoritmo es la siguiente: se seleccionan 5 algoritmos y 5 grafos, los grafos son extraídos del repositorio de Gutiérrez \cite{Mar}, de las tareas 1 y 2 en donde cada algoritmo de solución se aplica a los 5 grafos, mostrando el histograma de comparación de tiempos para cada grafo. Cabe destacar que cada tipo de algoritmo funciona sobre distintos grafos, ya sea dirigidos, no dirigidos o ambos, así como ponderados o no llevando a que se realicen las modificaciones necesarias para poder cumplir con los requerimientos del algoritmo.
+
+\newpage
+\section{all shortest paths}
+Este algoritmo de optimización resuelve el problema de la ruta más corta, recibe como parámetros un grafo que puede contar con las condiciones del cuadro \ref{cua1}, un nodo fuente y un nodo destino, el atributo correspondiente al peso de los arcos y finalmente el algoritmo de solucion que por default se considera el algoritmo de Dijkstra.\\
+
+Especificaciones
+
+\begin{table}[H] 
+\caption{{\small Condiciones del grafo para el algoritmo 1.}}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Dirigido & No dirigido & Ponderado & No ponderado \\ \hline
+Si       & Si          & Si        & Si*        \\  \hline
+\end{tabular}
+\label{cua1}
+\end{center}
+\end{table}
+
+*{\small Si no está ponderado, el algoritmo considera cada arista con costo igual a uno.}  \\
+
+En el código \ref{c4} se muestra como se emplea este algoritmo.  
+
+\captionof{lstlisting}{Algoritmo all shortest paths} \label{c4}
+\lstinputlisting[firstline=58, lastline=58]{Entregable.py}
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[scale=.4]{Algoritmo1.eps}
+\end{center}
+\vspace{-.3cm}
+\caption{{\small Histograma de los tiempos promedio por grafo}}
+\end{figure}
+
+ 
+\begin{figure}[H]
+\centering
+\subfigure[Grafo 1]{\includegraphics[width=65mm]{Corrida0.eps}}\hspace{5mm}
+\subfigure[Grafo 2]{\includegraphics[width=65mm]{Corrida1.eps}}\vspace{10mm}
+\subfigure[Grafo 3]{\includegraphics[width=65mm]{Corrida2.eps}}\hspace{10mm}
+\subfigure[Grafo 4]{\includegraphics[width=65mm]{Corrida3.eps}}\vspace{10mm}
+\subfigure[Grafo 5]{\includegraphics[width=65mm]{Corrida4.eps}}
+\caption{Solución de la ruta más corta a los grafos.} \label{g1}
+\end{figure}
+
+\newpage
+\section{betweenness centrality}
+Este algoritmo calcula la centralidad de intermediación de ruta más corta para los nodos. Recibe como parámetros un grafo que puede contar con las condiciones del cuadro \ref{cua2} y si se desea normalizar el coeficiente o no (True por defecto). \\
+
+Especificaciones
+
+\begin{table}[H] 
+\caption{{\small Condiciones del grafo para el algoritmo 2.}}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Dirigido & No dirigido & Ponderado & No ponderado \\ \hline
+Si       & Si          & Si*        & Si*        \\  \hline
+\end{tabular}
+\label{cua2}
+\end{center}
+\end{table}
+
+*{\small Si no se pondera, se consideran todos los arcos con el mismo peso.}  \\
+
+En el código \ref{c5} se muestra como se emplea este algoritmo.  
+
+\captionof{lstlisting}{Algoritmo betweenness centrality} \label{c5}
+\lstinputlisting[firstline=376, lastline=376]{Entregable.py}
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[scale=.4]{Algoritmo2.eps}
+\end{center}
+\vspace{-.3cm}
+\caption{{\small Histograma de los tiempos promedio por grafo}}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\subfigure[Grafo 1]{\includegraphics[width=65mm]{Corrida5.eps}}\hspace{5mm}
+\subfigure[Grafo 2]{\includegraphics[width=65mm]{Corrida6.eps}}\vspace{10mm}
+\subfigure[Grafo 3]{\includegraphics[width=65mm]{Corrida7.eps}}\hspace{10mm}
+\subfigure[Grafo 4]{\includegraphics[width=65mm]{Corrida8.eps}}\vspace{10mm}
+\subfigure[Grafo 5]{\includegraphics[width=65mm]{Corrida9.eps}}
+\caption{Solución del coeficiente de centralidad intermedia.} \label{g2}
+\end{figure}
+
+\newpage
+\section{coloring greedy color}
+Este algoritmo da solución al problema de coloreo de grafos, el cual trata de colorear todos los nodos de un color que para cada par adyacente de nodos no se puede tener el mismo color, siendo así, la función  retorna los nodos del grafo y el color que posee utilizando diversas estrategias. \\
+
+Especificaciones
+
+\begin{table}[H] 
+\caption{{\small Condiciones del grafo para el algoritmo 3.}}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Dirigido & No dirigido & Ponderado & No ponderado \\ \hline
+Si       & Si          & Si*        & Si*        \\  \hline
+\end{tabular}
+\label{cua3}
+\end{center}
+\end{table}
+
+*{\small Es indiferente si está ponderado o no, ya que este algoritmo se enfoca en los nodos.}  \\
+
+En el código \ref{c6} se muestra como se emplea este algoritmo. 
+
+\captionof{lstlisting}{Algoritmo coloring greedy color} \label{c6}
+\lstinputlisting[firstline=648, lastline=648]{Entregable.py}
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[scale=.4]{Algoritmo3.eps}
+\end{center}
+\vspace{-.3cm}
+\caption{{\small Histograma de los tiempos promedio por grafo}}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\subfigure[Grafo 1]{\includegraphics[width=65mm]{Corrida10.eps}}\hspace{5mm}
+\subfigure[Grafo 2]{\includegraphics[width=65mm]{Corrida11.eps}}\vspace{10mm}
+\subfigure[Grafo 3]{\includegraphics[width=65mm]{Corrida12.eps}}\hspace{10mm}
+\subfigure[Grafo 4]{\includegraphics[width=65mm]{Corrida13.eps}}\vspace{10mm}
+\subfigure[Grafo 5]{\includegraphics[width=65mm]{Corrida14.eps}}
+\caption{Solución al coloreo de grafos.} \label{g3}
+\end{figure}
+
+\newpage
+\section{maximum flow}
+Este algoritmo resuelve el problema de máximo flujo en una red, esta función toma como parámentros un grafo con las características mostradas en el cuadro \ref{cua4}, un nodo origen y otro destino, la capacidad máxima entre cada arco y retorna el valor de máximo flujo y también cual es la cantidad que fluye por cada arco. \\
+
+Especificaciones
+
+\begin{table}[H] 
+\caption{{\small Condiciones del grafo para el algoritmo 4.}}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Dirigido & No dirigido & Ponderado & No ponderado \\ \hline
+Si       & Si          & Si        & Si*        \\  \hline
+\end{tabular}
+\label{cua4}
+\end{center}
+\end{table}
+
+*{\small Si un arco no está ponderado, lo toma como si tuviera capacidad infinita.}  \\
+
+En el código \ref{c7} se muestra como se emplea este algoritmo.
+
+\captionof{lstlisting}{Algoritmo maximum flow} \label{c7}
+\lstinputlisting[firstline=949, lastline=949]{Entregable.py}
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[scale=.4]{Algoritmo4.eps}
+\end{center}
+\vspace{-.3cm}
+\caption{{\small Histograma de los tiempos promedio por grafo}}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\subfigure[Grafo 1]{\includegraphics[width=65mm]{Corrida15.eps}}\hspace{5mm}
+\subfigure[Grafo 2]{\includegraphics[width=65mm]{Corrida16.eps}}\vspace{10mm}
+\subfigure[Grafo 3]{\includegraphics[width=65mm]{Corrida17.eps}}\hspace{10mm}
+\subfigure[Grafo 4]{\includegraphics[width=65mm]{Corrida18.eps}}\vspace{10mm}
+\subfigure[Grafo 5]{\includegraphics[width=65mm]{Corrida19.eps}}
+\caption{Solución del máximo flujo en una red.} \label{g4}
+\end{figure}
+\newpage
+\section{minimum spanning tree}
+Este algoritmo resuelve el problema del árbol de expansión mínima, retorna arcos del grafo original que cubre todos los nodos y no se pueden formar ciclo y es el de menor costo posible. La función toma como parámetros un grafo G con condiciones mostradas en el cuadro \ref{cua5}, pesos (opcional) y un algoritmo de solución deseado, por default se considera el algoritmo de Kruskal. 
+
+Especificaciones
+
+\begin{table}[H] 
+\caption{{\small Condiciones del grafo para el algoritmo 5.}}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Dirigido & No dirigido & Ponderado & No ponderado \\ \hline
+Si       & Si          & Si        & Si*        \\  \hline
+\end{tabular}
+\label{cua5}
+\end{center}
+\end{table}
+
+*{\small Si el grafo es no ponderado considera el peso de los arcos como uno.}  \\
+
+En el código \ref{c8} se muestra como se emplea este algoritmo.
+
+\captionof{lstlisting}{Algoritmo minimum spanning tree} \label{c8}
+\lstinputlisting[firstline=1271, lastline=1271]{Entregable.py}
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[scale=.4]{Algoritmo5.eps}
+\end{center}
+\vspace{-.3cm}
+\caption{{\small Histograma de los tiempos promedio por grafo}}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\subfigure[Grafo 1]{\includegraphics[width=65mm]{Corrida20.eps}}\hspace{5mm}
+\subfigure[Grafo 2]{\includegraphics[width=65mm]{Corrida21.eps}}\vspace{10mm}
+\subfigure[Grafo 3]{\includegraphics[width=65mm]{Corrida22.eps}}\hspace{10mm}
+\subfigure[Grafo 4]{\includegraphics[width=65mm]{Corrida23.eps}}\vspace{10mm}
+\subfigure[Grafo 5]{\includegraphics[width=65mm]{Corrida24.eps}}
+\caption{Solución del árbol de expansión mínima.} \label{g5}
+\end{figure}
+
+\newpage
+\section{Comparación de algoritmos}
+En este último apartado se presenta un grafico que resuma de manera breve como es el comportamiento de los algoritmos
+siendo el que consume mayor tiempo el algoritmo 4, luego entre el 2 y el 5, posteriormente el 3 y al final el 1.
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[trim={0 0 0 3cm},clip,scale=.55]{grafica.eps}
+\end{center}
+\vspace{-1.5cm}
+\caption{{\small Grafica de violín para los algoritmos y grafos}}
+\end{figure}
+
+
+\newpage
+\bibliographystyle{unsrt}
+\bibliography{Tarea3}
+
+\end{document}
