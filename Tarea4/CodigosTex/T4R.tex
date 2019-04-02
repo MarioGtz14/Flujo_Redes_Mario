@@ -1,0 +1,255 @@
+\documentclass[12pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{listings}				%Utilizar codigo de un programa
+\usepackage{url}					%Ingresar url
+\usepackage{graphicx}				%Ingresar imagenes
+\usepackage[hang, small, labelfont=bf, up, textfont=it]{caption} % Custom captions under/above tables and figures
+\usepackage{float}
+\usepackage{enumerate}
+\usepackage{subfigure}
+
+\setlength{\parskip}{10pt}
+\setlength{\parindent}{0pt}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   
+  basicstyle=\footnotesize,        
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  commentstyle=\color{mygreen},    
+  deletekeywords={...},            
+  escapeinside={\%*}{*)},         
+  extendedchars=true,              
+  frame=single,	                   
+  keepspaces=true,                 
+  keywordstyle=\color{blue},       
+  language=Python,                 
+  numbers=left,
+  numbersep=4pt,
+  firstnumber=1,                    
+  showspaces=false,                
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  %title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\renewcommand{\lstlistingname}{Código}
+
+\title{\textbf{Complejidad asintótica experimental}}
+\author{Mario Alberto Gutiérrez Carrales \\
+		1549273}
+		
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{center}\rule{1.0\textwidth}{0.1mm} \end{center}
+\vspace{-1cm}
+\begin{center} \Large{\textbf{Introducción}} \end{center}
+\vspace{-1cm}
+\begin{center}\rule{1.0\textwidth}{0.2mm} \end{center}
+
+En esta práctica el enfoque central son los algoritmos de generación de grafos y las implementaciones de algoritmos de flujo máximo, utilizando la librería de NetworkX \cite{Net}. 
+
+Se plantean dos fases, la primera consiste en generar una matriz de datos de tiempos que representan el tiempo requerido que toma al algoritmo de solución resolver el grafo generado por el algoritmo de generación para esto se consideran algunos factores como réplicas de grafos, el número de nodos del grafo y la pareja de nodos fuente-destino. 
+
+La segunda fase consiste en realizar un análisis de varianza de un modelo donde el tiempo es la variable dependiente y las independientes son el algoritmo generador, algoritmo de solución, orden logarítmico y la densidad del grafo con el objetivo de saber efectos simples o de interacción son estadísticamente significativos.
+  
+\newpage
+\section{Algoritmos}
+
+\textbf{Generadores de grafos}.
+Cada generador crea un grafo dependiendo los parámetros que este recibe, es común que reciban un parámetro omitiendo los demás donde dicho parámetro indica el número de nodos, aunque no en todos los casos es así. En los siguientes puntos se habla a detalle de los generadores que se estudian en esta práctica.
+
+\begin{enumerate}[\hspace*{0.0cm}]
+\item \texttt{Grid graph}. Genera una malla n-dimensional rectangular, se específica al generador la dimensión que se desea y el numero de nodos para cada componente. En el código \ref{c4} se muestra como se utiliza la función y los parámetros que necesita para un caso en donde la dimensión es dos y de forma cuadrada, al dar el parámetro $n$ crea un grafo de $n^2$ nodos y $2(n^2-n)$ aristas. 
+
+\captionof{lstlisting}{Ejemplo generador Grid\_graph} \label{c4}
+\lstinputlisting[firstline=61, lastline=61]{GenerarBD.py}
+
+\item \texttt{Complete graph}. Este generador crea un grafo muy utilizado en la práctica que es el grafo completo, que es aquel en el que para cada par de vértices hay un camino que los une. La función tiene como parámetro el número de nodos que se desea que tenga el grafo. En el código \ref{c5} se muestra un ejemplo de esto. Si a este generador se le da como parámetro un entero $n$, entonces crea un grafo con $n$ nodos y $c(n,2)$ aristas.
+
+\captionof{lstlisting}{Ejemplo generador Complete\_graph} \label{c5}
+\lstinputlisting[firstline=133, lastline=133]{GenerarBD.py}
+ 
+\item \texttt{Circular ladder graph}. Al aplicar este generador se produce un grafo que consiste en dos ciclos de n nodos en donde cada uno de los n pares de nodos se unen por una arista. La función toma como parámetro un entero $n$ y crea un grafo con $2n$ nodos y $3n$ aristas. En el código \ref{c6} se muestra como se lleva a cabo el uso de este generador. 
+
+\captionof{lstlisting}{Ejemplo generador Circular\_ladder\_graph} \label{c6}
+\lstinputlisting[firstline=202, lastline=202]{GenerarBD.py}
+
+\end{enumerate}
+
+En la figura \ref{f1} se muestra un ejemplo de las visualizaciones para cada generador utilizado en esta práctica. 
+
+\begin{figure}[H]
+\centering
+\subfigure[Grid graph]{\includegraphics[width=40mm]{G2.eps}}\hspace{2mm} 
+\subfigure[Complete graph]{\includegraphics[width=40mm]{G3.eps}}\vspace{2mm}
+\subfigure[Circular ladder graph]{\includegraphics[width=40mm]{G1.eps}}\hspace{2mm}
+\caption{Visualización de grafos creados con los algoritmos generadores.} \label{f1}
+\end{figure}
+
+\textbf{Implementaciones para el problema de máximo flujo}. El problema de máximo flujo es un problema muy interesante en la optimización en redes, debido a ello se han desarrollado un gran número de implementaciones en diferentes softwares, en NetworkX hay una lista con una gran cantidad de implementaciones. En los siguientes puntos se describen aquellas que se utilizarán en esta práctica. 
+
+\begin{enumerate}[\hspace*{0.0cm}]
+\item \texttt{Maximum flow}. Esta implementación retorna el valor de máximo flujo y además la cantidad que fluye por cada arco. En el código \ref{c7} se muestra un ejemplo de esta implementación.
+
+\captionof{lstlisting}{Ejemplo generador Grid\_graph} \label{c7}
+\lstinputlisting[firstline=98, lastline=98]{GenerarBD.py}
+
+\item \texttt{Minimum cut value}. El valor de mínimo corte es retornado al llevar a cabo esta implementación. En el código \ref{c8} se muestra como se utiliza esta implementación.
+
+\captionof{lstlisting}{Ejemplo generador Grid\_graph} \label{c8}
+\lstinputlisting[firstline=103, lastline=103]{GenerarBD.py}
+ 
+\item \texttt{Maximum flow value}. Se retorna solamente el valor de máximo flujo. Se muestra un ejemplo en el código \ref{c9}.
+
+\captionof{lstlisting}{Ejemplo generador Grid\_graph} \label{c9}
+\lstinputlisting[firstline=108, lastline=108]{GenerarBD.py}
+
+\end{enumerate}
+
+En los tres casos la función recibe como parámetros el nodo fuente y destino, así como el atributo que tiene el papel de la capacidad. En las implementaciones para el problema de máximo flujo, si un arco no tiene una capacidad asignada se considera como infinita. 
+
+Se puede tener acceso a todos los algoritmos generadores de grafos y las implementaciones para el problema de máximo flujo a traves de los siguientes \textit{links}:
+
+Generadores. \\
+\small {\url{https://networkx.github.io/documentation/stable/reference/generators.html}}
+
+Implementaciones. \\
+\small{\url{https://networkx.github.io/documentation/stable/reference/algorithms/flow.html#module-networkx.algorithms.flow}}
+
+
+\newpage
+\section{Ambiente computacional}
+
+Para llevar a cabo la experimentación se utiliza \texttt{python} \cite{Python} y para poder utilizar las funciones requeridas se necesitan las siguientes librerías:
+
+\begin{enumerate}
+\item \textcolor{blue}{\texttt{NetworkX}}. Como se mencionó anteriormente, esta librería es de gran ayuda para la manipulación de grafos.
+
+\item \textcolor{blue}{\texttt{Matplotlib}} \cite{Mat}. Esta librería contiene funciones que sirven para visualizar gráficas y guardar imágenes en distintos formatos, en particular el eps.
+ 
+\item \textcolor{blue}{\texttt{Time}} \cite{PythonHow}. Contiene la función que determina el tiempo (en segundos) que uno o varios procesos tardan, dicho tiempo se calcula con una diferencia entre el tiempo inicial y el final.
+
+\item \textcolor{blue}{\texttt{Numpy}} \cite{Num}. Entre las funciones que proporciona esta librería, se encuentra aquella que calcula la media y desviación estándar de una lista, en este caso será necesaria para calcular tiempos promedios y desviaciones estándar entre los tiempos de algoritmos. 
+
+\item \textcolor{blue}{\texttt{Pandas}} \cite{Pd}. Una de las funciones con las que cuenta esta librería es la lectura de archivos con extensión csv y la manipulación de \textit{data frames} facilitando el uso de tablas.
+
+\item \textcolor{blue}{\texttt{Seaborn}} \cite{sns}. Se utiliza para la creación del diagrama de caja y bigotes.
+
+\item \textcolor{blue}{\texttt{Statmodels}} \cite{stm}. Contiene varios modelos estadísticos y entre ellos esta el \texttt{ols} que sirve para ajustar formulas y entre los modelos a usar esta el anova\_lm y ols. 
+
+\end{enumerate}
+
+\captionof{lstlisting}{Librerias utilizadas en la elaboración del código} \label{c4}
+\lstinputlisting[firstline=1, lastline=8]{BD.py}
+
+Para guardar imagenes en formato eps se utiliza el comando que proporciona el fragmento de código \ref{c10}.
+
+\vspace{.3cm}
+\captionof{lstlisting}{Guardar imágenes en formato \textit{eps}} \label{c10}
+\lstinputlisting[firstline=94, lastline=94]{Entregable.py} 
+\vspace{.6cm}
+
+Para evitar que los bordes de una imagen se recorten al momento de guardarla se le aplica el proceso que se muestra en el código \ref{c11}.
+\vspace{.3cm}
+\captionof{lstlisting}{Aumentar bordes para evitar cortes en el grafo} \label{c11}
+\lstinputlisting[firstline=83, lastline=90]{Entregable.py}
+
+\vspace{.4cm}
+El objetivo de la experimentación es realizar una comparación entre los tiempos de ejecución tomando en cuenta varios factores para resolver un problema de máximo flujo, para eso, se utiliza una laptop con sistema operativo de 64 bits y un procesador amd A9-9410 radeon R5, 5 compute cores 2C+3G 2.90 GHz. \\
+
+Se consideran los siguientes parámetros:
+\begin{itemize}
+\item 3 Generadores (Grid, Complete y Circular ladder).
+\item 3 ordenes  (27, 81 y 243).
+\item 10 Grafos distintos.
+\item 3 Implementaciones (Maximum flow, Minimum cut value y Maximum flow value).
+\item 5 parejas fuente-destino (aleatorias).
+\end{itemize}
+
+Se les asigna la variable aleatoria P a las capacidades de los arcos tal que $P\sim N(15,5)$ y además para evitar tiempos nulos se consideran 100 repeticiones.
+
+\newpage
+\section{Experimentación}
+
+Una vez que se genera la matriz de datos con la caracterización de cada observación y su respectivo tiempo de ejecución se procede a la siguiente fase que es la experimentación estadística. En la figura \ref{f2} se observa como se comporta el tiempo de ejecución (en segundos) para los distintos grupos y niveles de cada grupo.  
+
+\begin{figure}[H]
+\centering
+\subfigure[Algoritmo generador]{\includegraphics[width=65mm]{A1.eps}}\hspace{5mm} 
+\subfigure[Orden logarítmico]{\includegraphics[width=65mm]{A2.eps}}\vspace{8mm}
+\subfigure[Algoritmo de solución]{\includegraphics[width=65mm]{A3.eps}}\hspace{5mm}
+\subfigure[Densidad del grafo]{\includegraphics[width=65mm]{A4.eps}}
+\caption{Variación del tiempo de ejecución por nivel de los diferentes grupos.} \label{f2}
+\end{figure}
+
+En la figura \ref{f2} (a) se observa que el generador 1 es el que consume mayor tiempo y es un resultado que se esperaba puesto que este generador se aplica para crear grafos en 2 dimensiones, en (b) se hace énfasis a que entre mayor orden, mayor tiempo de ejecución, en (c) podría parecer que el efecto del algoritmo es nulo, es decir que no aportan variación en el tiempo de ejecución y en (d) se observa que a menor densidad mayor tiempo de ejecución aunque cuando la densidad es uno, tambien aumenta un poco el tiempo. 
+
+\newpage
+Posteriormente se efectúa un análisis de varianza (ANOVA) tipo dos para determinar los factores que tienen efecto sobre el tiempo, también es considerada la interacción entre los factores en el modelo para saber el tipo de efecto en la variable de respuesta.
+
+Se considera el siguiente modelo matemático:
+
+\begin{displaymath} Y_{ijkl} = \mu_{...} + \alpha_i + \beta_j + \gamma_k + \delta_l + (\alpha \beta)_{ij} + (\alpha \gamma)_{ik} + (\alpha \delta)_{il} + (\beta \gamma)_{jk} + (\beta \delta)_{jl} + (\gamma \delta)_{kl} + \varepsilon_{ijkl}
+\end{displaymath}
+Donde:
+\vspace{-.3cm}
+\begin{itemize}
+\item  $\mu_{...},\alpha_i,\beta_j, \gamma_k, \delta_l,(\alpha \beta)_{ij}, (\alpha \gamma)_{ik}, (\alpha \delta)_{il}, (\beta \gamma)_{jk}, (\beta \delta)_{jl}, (\gamma \delta)_{kl}$  son parámetros que representan el efecto de cada nivel para cada factor simple y de interacción.
+
+\item $\varepsilon_{ijkl} \sim N(0,\sigma^2)$
+\end{itemize}
+
+y se realizan las siguientes pruebas estadísticas:
+
+\begin{enumerate}
+\item si cada factor tiene un efecto simple significativo en la variación del tiempo de ejecución
+\item si cada pareja de factores tiene un efecto de interacción significativo sobre el tiempo de ejecución
+\end{enumerate}
+
+En el cuadro \ref{cua1} se muestran los resultados después de efectuar el ANOVA donde se destaca que dados los tiempos correspondientes se tiene que cada valor p (simple y de interacción) es menor a .05.
+
+\begin{table}[H] 
+\vspace{-.1cm}
+\caption{{\small Análisis de varianza del tiempo de ejecución.}}
+\centering
+\scalebox{0.6}{
+\begin{tabular}{|l|r|r|r|r|}
+%\caption{Análisis de varianza para el tiempo de ejecución}
+\hline
+\multicolumn{1}{|c|}{\textbf{Fuente}} & \multicolumn{1}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Suma de \\ cuadrados\end{tabular}}} & \multicolumn{1}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Grados de \\ libertad\end{tabular}}} & \multicolumn{1}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Razón \\     F\end{tabular}}} & \multicolumn{1}{c|}{\textbf{P(\textgreater{}F)}} \\ \hline
+Generador                             & 1.974622e+07                                                                               & 1                                                                                           & 11894.0916                                                                           & 0.0000                                           \\ \hline
+Orden                                 & 3.012073e+07                                                                               & 1                                                                                           & 18143.1582                                                                           & 0.0000                                           \\ \hline
+Solucion                              & 7.021175e+04                                                                               & 1                                                                                           & 42.291901                                                                            & 0.0000                                           \\ \hline
+Densidad                              & 5.559616e+06                                                                               & 1                                                                                           & 3348.82309                                                                           & 0.0000                                           \\ \hline
+Generador:Orden                       & 1.292572e+07                                                                               & 1                                                                                           & 7785.78226                                                                           & 0.0000                                           \\ \hline
+Generador:Solucion                    & 8.767172e+04                                                                               & 1                                                                                           & 52.808873                                                                            & 0.0000                                           \\ \hline
+Generador:Densidad                    & 1.172786e+04                                                                               & 1                                                                                           & 7.064253                                                                             & 0.0080                                           \\ \hline
+Orden:Solucion                        & 9.736782e+04                                                                               & 1                                                                                           & 58.649303                                                                            & 0.0000                                           \\ \hline
+Orden:Densidad                        & 5.499527e+06                                                                               & 1                                                                                           & 3312.62828                                                                           & 0.0000                                           \\ \hline
+Solucion:Densidad                     & 2.271015e+04                                                                               & 1                                                                                           & 13.679409                                                                            & 0.0002                                           \\ \hline
+Residual                              & 2.222968e+06                                                                               & 1339                                                                                        & \multicolumn{1}{l|}{NA}                                                              & \multicolumn{1}{l|}{NA}                          \\ \hline
+\end{tabular}}
+\label{cua1}
+\end{table}
+
+Del anova mostrado en el cuadro \ref{cua1} podemos concluir que: se proporcionan valores p que son casi cero, por lo cual se puede decir que dada la elección de los párametros mencionados en el ambiente computacional se obtiene una gran variación del tiempo de ejecución dado cualquier factor en el modelo y también cualquier interacció, es decir, si se cambia de nivel en algún  factor por si solo o combinación de factores es muy seguro que haya grandes cambios en el tiempo de ejecución. 
+
+\newpage
+\bibliographystyle{unsrt}
+\bibliography{Tarea4Ref}
+
+\end{document}
