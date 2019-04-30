@@ -1,0 +1,416 @@
+\documentclass[12pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{listings}				
+\usepackage{url}					
+\usepackage{graphicx}		
+\usepackage[hang, small, labelfont=bf, up, textfont=it]{caption} 
+\usepackage{float}
+\usepackage{enumerate}
+\usepackage{subfigure}
+\usepackage{fancybox}
+\usepackage{float}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   
+  basicstyle=\footnotesize,        
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  commentstyle=\color{mygreen},    
+  deletekeywords={...},            
+  escapeinside={\%*}{*)},         
+  extendedchars=true,              
+  frame=single,	                   
+  keepspaces=true,                 
+  keywordstyle=\color{blue},       
+  language=Python,                 
+  numbers=left,
+  numbersep=4pt,
+  firstnumber=1,                    
+  showspaces=false,                
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  %title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\renewcommand{\lstlistingname}{Código}
+
+
+\title{\textbf{Caracterización estructural de instancias}}
+\author{Mario Alberto Gutiérrez Carrales \\ 1549273}
+		
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\setlength{\parskip}{10pt}
+\setlength{\parindent}{0pt}
+\setlength{\fboxrule}{1 pt}
+\setlength{\fboxsep}{.1 cm}
+
+\begin{center}\rule{1.0\textwidth}{0.1mm} \end{center}
+\vspace{-1cm}
+\begin{center} \Large{\textbf{Introducción}} \end{center}
+\vspace{-1cm}
+\begin{center}\rule{1.0\textwidth}{0.2mm} \end{center}
+
+La presente práctica consiste en llevar a cabo cinco aplicaciones basadas en un caso de la vida real que sean consideradas como instancias del problema de máximo flujo de redes. Se analiza cada caso por separado realizando diferentes comparaciones de los elementos de la instancia para caracterizar a aquellos que la hacen hacen más efectiva. 
+
+Los principales objetos de estudio que se consideran son los tiempos de ejecución y valores de flujo máximo ya que son quienes determinan la eficiencia de la instancia, los siguientes objetos con mayor importancia son los elementos del grafo, por ejemplo como los nodos y aristas así como la capacidad en las aristas y la cantidad que fluye entre ellas.
+
+El lenguaje de programación que se utiliza es \texttt{python} \cite{Python} y una de las principales librerías que es necesaria para esta práctica es \textcolor{blue}{\texttt{NetworkX}} \cite{Net} con funciones especiales para grafos, en especial para crear, acomodar y resolver problemas de optimización en redes utilizando distintos algoritmos.
+
+\newpage
+\section{Ambiente computacional}
+
+Los experimentos realizados en esta práctica se realizaron en una PC con un sistema operativo de 64 bits, procesador AMD A9-9410 Radeon R5, 2 núcleos + 3G con 2.90 GHz de velocidad y 12 GB de memoria RAM.
+
+Para llevar a cabo la experimentación en \texttt{python}  y para poder utilizar las funciones requeridas se necesitan las siguientes librerías:
+
+\begin{enumerate}
+\item \textcolor{blue}{\texttt{NetworkX}}. Como se mencionó con anterioridad, esta librería es de gran ayuda para la manipulación de grafos.
+
+\item \textcolor{blue}{\texttt{Matplotlib}} \cite{Mat}. Esta librería contiene funciones que sirven para visualizar gráficas y guardar imágenes en distintos formatos, en particular el \textit{eps}.
+ 
+\item \textcolor{blue}{\texttt{Time}} \cite{PythonHow}. Contiene la función que determina el tiempo (en segundos) que uno o varios procesos tardan, dicho tiempo se calcula con una diferencia entre el tiempo inicial y el final.
+
+\item \textcolor{blue}{\texttt{Pandas}} \cite{Pd}. Una de las funciones con las que cuenta esta librería es la lectura de archivos con extensión \textit{csv} y la manipulación de \textit{data frames} facilitando el uso de tablas.
+
+\item \textcolor{blue}{\texttt{Seaborn}} \cite{sns}. Se utiliza para la creación del diagrama de caja y bigotes.
+
+\end{enumerate}
+
+Dichas librerías se importan al entorno de \texttt{python} tal como se muestra en el código \ref{c1}.
+
+\captionof{lstlisting}{Cargar librerías en \texttt{python}} \label{c1}
+\lstinputlisting[firstline=4, lastline=8]{Clase1.py}
+
+\newpage
+Para guardar imágenes en formato eps se utiliza el comando que proporciona el fragmento de código \ref{c2}.
+
+\vspace{.3cm}
+\captionof{lstlisting}{Guardar imágenes en formato \textit{eps}} \label{c2}
+\lstinputlisting[firstline=439, lastline=439]{Clase1.py} 
+\vspace{.6cm}
+
+Para evitar que los bordes de una imagen se recorten al momento de guardarla se le aplica el proceso que se muestra en el código \ref{c3}.
+
+\vspace{.3cm}
+\captionof{lstlisting}{Aumentar bordes para evitar cortes en la imagen} \label{c3}
+\lstinputlisting[firstline=282, lastline=284]{Clase1.py}
+
+\newpage
+\section{Algoritmos para características de nodos}
+
+\begin{enumerate}
+\item \textcolor{blue}{\texttt{degree\_centrality}}. La centralidad del grado para un nodo $v$ es la fracción de nodos a los que está conectado. Recibe como único parámetro un grafo.  
+
+\item \textcolor{blue}{\texttt{closeness\_centrality}}. Este algoritmo calcula la centralidad de cercanía de los vértices, tomando el recíproco del promedio de las distancias más cortas y normalizando. Recibe como parámetro principal un grafo y un parámetro opcional que es la normalización de los valores.
+ 
+\item \textcolor{blue}{\texttt{clustering}}. Lo que mide este algoritmo es el nivel de agrupamiento que existe entorno a un vértice, que se calcula como el número total de aristas que conectan a los vecinos más cercanos entre el número máximo de aristas posibles entre todos los vecinos más cercanos. Este algoritmo calcula el coeficiente de agrupamiento de los vértices y recibe como parámetro un grafo.
+
+\item \textcolor{blue}{\texttt{load\_centrality}}. Es la fracción de todas las rutas más cortas que pasan a través de ese nodo. Recibe como parámetro principal un grafo y un parámetro opcional que es la normalización de los valores.
+
+\item \textcolor{blue}{\texttt{eccentricity}}. La excentricidad de un nodo $v$ es la distancia máxima de $v$ a todos los demás nodos. Retorna la excentricidad de los nodos de un grafo y recibe como parámetros un grafo.
+
+\item \textcolor{blue}{\texttt{pagerank}}. El algoritmo pagerank calcula la probabilidad de que si uno navega las aristas del grafo aleatoriamente, vaya a dar a un nodo específico. Recibe un grafo como parámetro.
+
+\end{enumerate}
+
+{\scriptsize *Todos los valores retornados son guardados en una variable tipo diccionario en el que las claves son los nodos y los valores son los números que retorna el algoritmo. En el código \ref{c4} se muestra un ejemplo de como guardar dichos valores en un arreglo.}  
+
+%En el código \ref{c4} se observa como se guardan los valores que generan los algoritmos.
+
+\captionof{lstlisting}{Guardar los valores de los algoritmos en un arreglo} \label{c4}
+\lstinputlisting[firstline=5, lastline=10]{ejem_3.py}
+
+\newpage
+\section{Metodología}
+Primero se elige una aplicación real, luego ciertos algoritmos para trabajar dicha aplicación y analizar diferentes variaciones. Para la construcción de cada instancia se toman en cuenta las siguientes características: \\
+
+\textbf{Aplicación}. Un \textcolor{blue}{\textit{sistema de tuberías}} es un conducto que cumple la función de transportar agua u otros fluidos \cite{Flu}, en este caso supondremos que las aplicaciones son enfocadas en flujo de agua. Esta aplicación fue seleccionada debido a la gran importancia de los sistemas de tuberías en la industria y también por la eficiencia de un recurso vital como el agua, dependiendo de la situación dicho sistema debe cumplir con ciertas características físicas.  \\
+
+\textbf{Algoritmo generador}. \textcolor{blue}{\textit{Barabasi\_albert\_graph}} que toma dos parámetros, el primero es el número de nodos que tendrá el grafo y el segundo es el número de aristas que salen de cada nodo a otros. Se seleccionó este generador ya que gracias a su segundo parámetro se controla la cantidad de aristas presentes en el grafo y de esta manera aumentar su semejanza a una aplicación real en la que puede haber muchos nodos pero no tantas aristas. \\
+
+\textbf{Algoritmo de acomodo}. \textcolor{blue}{\textit{Kamada\_kawai\_layout}} que toma como parámetro el grafo generado y retorna un diccionario con la la posición de cada nodo. Este algoritmo fue seleccionado gracias a que en la práctica dos de Gutiérrez \cite{Mar} se realizó una comparación y debido a las características del grafo es el que mejor se adapta visualmente. \\
+
+\textbf{Implementación para el problema de máximo flujo}. \textcolor{blue}{\textit{Maximum\_flow}} que toma tres parámetros, el grafo que se resolvera, junto con el nodo inicial y el nodo final, esta función retorna dos objetos, un número que es el valor de máximo flujo de la instancia y también un diccionario que contiene los valores de flujo entre cada arco. A pesar de que este es un algoritmo que le toma mayor tiempo en resolver la instancia a comparación de otros el hecho de poder conocer el flujo de cada arista hace relevante esta implementación.  \\
+
+En el código \ref{c5} se muestra como se puede llevar a cabo el proceso de generación, acomodo y solución de instancia.
+
+\vspace{.6cm}
+\captionof{lstlisting}{Proceso de solución de instancia} \label{c5}
+\lstinputlisting[firstline=4, lastline=9]{Ej2.py} 
+\vspace{.6cm}
+
+En la figura \ref{f1} se muestra el resultado del grafo generado y acomodado con los algoritmos indicados anteriormente.
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[scale=.4]{Ej.eps}
+\end{center}
+\vspace{-.6cm}
+\caption{{\small Grafo con algoritmo de acomodo}} \label{f1}
+\end{figure}
+
+
+Posteriormente se lleva a cabo un análisis por instancia en el siguiente orden:
+\begin{enumerate}
+\setlength\itemsep{.1cm}
+
+\item Visualización de instancia. Se muestran los nodos del grafo distinguiendo el inicio (\textcolor{Magenta}{rosa}), final (\textcolor{red}{rojo}) y los intermedios (\textcolor{Aquamarine}{aqua}). Además el grosor de la arista representa la capacidad en relación a las demás aristas.
+
+\item Visualización de instancia con solución. Se muestra el grafo anterior añadiendo el flujo que corresponde a cada arista (\textcolor{Cyan}{celeste}) preservando la idea de que el grosor del flujo indica una relación con los demás flujos, también se añade la variación de tamaño de los nodos de la instancia utilizando los algoritmos para características de nodos, esto con el fin de determinar cuales son los más relevantes (a mayor radio, mayor relevancia).
+
+\item Visualización de instancia con solución y caracterización. Se toma el mismo gráfico anterior con la sutileza de que se le añade color a los nodos intermedios que fungen un papel importante, es decir, que si se varía el nodo inicial o final para dicha instancia podrían ser un buen nodo inicial o final, gracias a que se mejora la función objetivo. Los nodos que son buen inicio pero no final (\textcolor{blue}{azul} y \textcolor{LimeGreen}{verde limón}), aquellos que son mejor nodo final pero no inicial (\textcolor{Plum}{morado} y \textcolor{LimeGreen}{verde limón}) y por último los nodos que son tanto mejor inicio como mejor final (\textcolor{GreenYellow}{amarillo}).
+
+\item Discusión de las características de nodos y parejas que mejoran el flujo a la instancia. 
+
+\item Comparación del tiempo de ejecución (TE) variando el nodo inicial. 
+
+\item Comparación del tiempo de ejecución (TE) variando el nodo final.
+
+\item Comparación tiempo de ejecución (TE) variando un nodo intermedio eliminado.
+
+\item Discusión del mejor nodo posible, tiempos de ejecución y posibles nodos a eliminar de la instancia. 
+\end{enumerate}
+
+Para el caso de las visualizaciones de las instancias, solamente en la grafica 1 se muestra el número de nodo. \\
+
+Para los casos 5, 6 y 7 se grafican los diagramas de caja y bigote identificandp los casos en los que la función objetivo mejora (\textcolor{red}{rojo}) y los que permanecen igual o disminuyen (\textcolor{blue}{azul}). \\
+
+Después de analizar cada instancia, se realiza una comparación global mediante un diagrama de caja para cada una de las características de los nodos correspondientes a las diferentes instancias. 
+
+\newpage
+\section*{Instancia 1}
+
+\begin{figure}[H]
+\centering
+\subfigure[Instancia]{\doublebox{\includegraphics[width=60mm]{G_1_1.eps}}\hspace{2mm}}
+\subfigure[Instancia con solución]{\doublebox{\includegraphics[width=60mm]{G_1_2.eps}}\hspace{2mm}}
+\subfigure[Instancia con solucion y caracterización]{\doublebox{\includegraphics[width=65mm]{G_1_3.eps}}}
+
+\caption{Visualización de la instancia 1.} \label{f2}
+\end{figure}
+
+En la figura \ref{f2} se observa que del total de las aristas solo se usan 5, representando el 41.6\%. \\
+
+También se muestra que los nodos 2 y 3 tiene en general mejores características que el resto y que para esta instancia los nodos 2, 3, 4, 5 y 7 son mejores nodos finales (destino) que el principal, obteniendo un aumento en la función objetivo. \\
+
+Por otro lado, si el problema se resuelve variando el nodo inicial no se obtiene mejora la función objetivo.
+
+\newpage
+
+\begin{figure}[H]
+\centering
+\subfigure[Comparación de TE variando la fuente]{\doublebox{\includegraphics[width=60mm]{CF_1.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando el destino]{\doublebox{\includegraphics[width=60mm]{CD_1.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando eliminado]{\doublebox{\includegraphics[width=65mm]{CE_1.eps}}}
+
+\caption{Comparación del tiempo de ejecución para la instancia 1.} \label{f3}
+\end{figure}
+
+En la figura \ref{f3} se observa que solamente empeora la función objetivo cuando se cambia el nodo inicial al 1, todos los demas son iguales al inicial, y los mejores en cuanto a tiempo de ejecución son el nodo 0 y el 7. \\
+
+Como se mencionó en el apartado de visualización, cuando se varía el nodo final se obtienen varias mejoras, y de esas mejoras los que presentan mejores tiempos de ejecución son el nodo 2 y 7, sobretodo el 2.\\
+
+Si se elimina un nodo intermedio, no se obtienen mejoras en la función objetivo, así que no conviene eliminar ningún nodo.
+
+\newpage
+\section*{Instancia 2}
+
+\begin{figure}[H]
+\centering
+\subfigure[Instancia]{\doublebox{\includegraphics[width=60mm]{G_2_1.eps}}\hspace{2mm}}
+\subfigure[Instancia con solución]{\doublebox{\includegraphics[width=60mm]{G_2_2.eps}}\hspace{2mm}}
+\subfigure[Instancia con solucion y caracterización]{\doublebox{\includegraphics[width=65mm]{G_2_3.eps}}}
+
+\caption{Visualización de la instancia 2.} \label{f4}
+\end{figure}
+
+En la figura \ref{f4} se observa que del total de las aristas solo se usan 5, representando el 33.3\%. \\
+
+También se muestra que los nodos 1, 3 y 4 tiene en general mejores características que el resto y que para esta instancia todos los nodos intermedios son mejores nodos iniciales (fuente) que el principal, obteniendo un aumento en la función objetivo. \\
+
+Por otro lado, si el problema se resuelve variando el nodo final no se obtiene mejora la función objetivo.
+
+\newpage
+
+\begin{figure}[H]
+\centering
+\subfigure[Comparación de TE variando la fuente]{\doublebox{\includegraphics[width=60mm]{CF_2.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando el destino]{\doublebox{\includegraphics[width=60mm]{CD_2.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando eliminado]{\doublebox{\includegraphics[width=65mm]{CE_2.eps}}}
+
+\caption{Comparación del tiempo de ejecución para la instancia 2.} \label{f5}
+\end{figure}
+
+%---------------------------------------------------------------------------- 
+En la figura \ref{f5} se observa que cuando se varía el nodo inicial se obtienen solamente mejoras, y de esas mejoras los nodos que presentan mejor función objetivo son el 1, 3 y 4, de los cuales el que presenta mejor tiempo de ejecución es el 3. \\
+
+También se observa que fijando el nodo inicial y cambiando el nodo destino siempre se obtiene el mismo valor en la función objetivo, gracias a eso, y a la comparación de tiempos de ejecución, se podría considerar que los mejores nodos el 1 y el 7. \\
+
+Si se elimina un nodo intermedio, no se obtienen mejoras en la función objetivo, así que no conviene eliminar ningún nodo, de hecho, si se elimina el nodo 3, el problema es infactible, por eso la importancia de este nodo. 
+
+\newpage
+\section*{Instancia 3}
+
+\begin{figure}[H]
+\centering
+\subfigure[Instancia]{\doublebox{\includegraphics[width=60mm]{G_3_1.eps}}\hspace{2mm}}
+\subfigure[Instancia con solución]{\doublebox{\includegraphics[width=60mm]{G_3_2.eps}}\hspace{2mm}}
+\subfigure[Instancia con solucion y caracterización]{\doublebox{\includegraphics[width=65mm]{G_3_3.eps}}}
+
+\caption{Visualización de la instancia 3.} \label{f6}
+\end{figure}
+
+En la figura \ref{f6} se observa que del total de las aristas solo se usan 9, representando el 60\%. \\
+
+También se muestra que los nodos 4 y 5 tiene en general mejores características que el resto y que para esta instancia los nodos 1, 4, 6 y 7 son mejores nodos iniciales (fuente) que el principal, obteniendo un aumento en la función objetivo. \\
+
+Por otro lado, si el problema se resuelve variando el nodo final no se obtiene mejora la función objetivo.
+
+\newpage
+
+\begin{figure}[H]
+\centering
+\subfigure[Comparación de TE variando la fuente]{\doublebox{\includegraphics[width=60mm]{CF_3.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando el destino]{\doublebox{\includegraphics[width=60mm]{CD_3.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando eliminado]{\doublebox{\includegraphics[width=65mm]{CE_3.eps}}}
+
+\caption{Comparación del tiempo de ejecución para la instancia 3.} \label{f7}
+\end{figure}
+
+%---------------------------------------------------------------------------- 
+En la figura \ref{f7} se observa que si se resuelve la instancia cambiando el nodo inicial, se obtienen diferentes mejoras, los nodos para los cuales se presenta eso son el 1, 4, 6 y 7 y de estos el que obtiene mayor función objetivo es el 4, pero también es el que más tiempo le toma en resolver la instancia.   \\
+
+Como se mencionó en el apartado de visualización, cuando se varía el nodo final no se obtiene ninguna mejora, pero si se obtienen valores que empatan en función objetivo con la instancia original, los nodos para los que ocurre esto, son el 1, 4, 6 y 7, de los cuales los que se ejecutan en menor tiempo son el 7 y la instancia original con el nodo destino 5. \\
+
+Si se elimina un nodo intermedio, no se obtienen mejoras en la función objetivo, pero si hay quienes se pueden eliminar y se conserva el valor del flujo óptimo, en este caso, se puede eliminar el nodo 3 por estar aislado. 
+
+\newpage
+\section*{Instancia 4}
+
+\begin{figure}[H]
+\centering
+\subfigure[Instancia]{\doublebox{\includegraphics[width=60mm]{G_4_1.eps}}\hspace{2mm}}
+\subfigure[Instancia con solución]{\doublebox{\includegraphics[width=60mm]{G_4_2.eps}}\hspace{2mm}}
+\subfigure[Instancia con solucion y caracterización]{\doublebox{\includegraphics[width=65mm]{G_4_3.eps}}}
+
+\caption{Visualización de la instancia 4.} \label{f8}
+\end{figure}
+
+En la figura \ref{f8} se observa que del total de las aristas se usan 26, representando el 92.85\%. \\
+
+También se muestra que los nodos 3 y 5 tienen en general mejores características que el resto y que para esta instancia los nodos 0, 1, 2, 3, 4, 6, 8 y 11 son mejores nodos finales (destino) que el principal, obteniendo un aumento en la función objetivo. \\
+
+Por otro lado, si el problema se resuelve variando el nodo inicial no se obtiene mejora la función objetivo.
+
+\newpage
+
+\begin{figure}[H]
+\centering
+\subfigure[Comparación de TE variando la fuente]{\doublebox{\includegraphics[width=60mm]{CF_4.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando el destino]{\doublebox{\includegraphics[width=60mm]{CD_4.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando eliminado]{\doublebox{\includegraphics[width=65mm]{CE_4.eps}}}
+
+\caption{Comparación del tiempo de ejecución para la instancia 4.} \label{f9}
+\end{figure}
+
+%---------------------------------------------------------------------------- 
+En la figura \ref{f9} se observa que no hay mejoras en la función objetivo variando el nodo inicial y los que la empeoran son los nodos 7, 9, 10, 12, 13 y 15, el resto conserva el mismo flujo que el nodo inicial original, de los cuales el nodo 8 es el que presenta menor tiempo de ejecución al resolver la instancia. \\
+
+Como se mencionó en el apartado de visualización, cuando se varía el nodo final se obtienen varias mejoras, y de esas mejoras los que presentan mayor función objetivo son los nodos 2 y 3, siendo el 2 el que presenta menor tiempo de ejecución.\\
+
+Si se elimina un nodo intermedio, no se obtienen mejoras en la función objetivo, pero para algunos se conserva el flujo de la instancia original, así que se pudiera eliminar alguno de ellos, los mejores candidatos son 1, 9, 12 y 15 ya que son los que hacen que la distancia se resuelva más rápido. 
+
+\newpage
+\section*{Instancia 5}
+
+\begin{figure}[H]
+\centering
+\subfigure[Instancia]{\doublebox{\includegraphics[width=60mm]{G_5_1.eps}}\hspace{2mm}}
+\subfigure[Instancia con solución]{\doublebox{\includegraphics[width=60mm]{G_5_2.eps}}\hspace{2mm}}
+\subfigure[Instancia con solucion y caracterización]{\doublebox{\includegraphics[width=65mm]{G_5_3.eps}}}
+
+\caption{Visualización de la instancia 5.} \label{f10}
+\end{figure}
+
+En la figura \ref{f10} se observa que del total de las aristas se usan 28, representando el 96.55\%. \\
+
+También se muestra que los nodos 3 y 4 tiene en general mejores características que el resto y que para esta instancia todos los nodos intermedios son mejores nodos finales (destino) que el principal, obteniendo un aumento en la función objetivo. \\
+
+Por otro lado, si el problema se resuelve variando el nodo inicial no se obtiene mejora la función objetivo.
+
+\newpage
+
+\begin{figure}[H]
+\centering
+\subfigure[Comparación de TE variando la fuente]{\doublebox{\includegraphics[width=60mm]{CF_5.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando el destino]{\doublebox{\includegraphics[width=60mm]{CD_5.eps}}\hspace{2mm}}
+\subfigure[Comparación de TE variando eliminado]{\doublebox{\includegraphics[width=65mm]{CE_5.eps}}}
+
+\caption{Comparación del tiempo de ejecución para la instancia 5.} \label{f11}
+\end{figure}
+
+%---------------------------------------------------------------------------- 
+En la figura \ref{f11} se observa que no importa que nodo se tome como nodo fuente siempre se obtiene el mismo flujo y de estos el que resuelve la instancia más rápido es el nodo 7, presentando algunos casos atípicos con mayor tiempo. \\
+
+Por otro lado, como se mencionó en el apartado de visualización cuando se varía el nodo final todos brindan mejor función objetivo, en especial los nodos 1, 3 y 4, siendo este ultimo el de mayor valor y el de menor tiempo de ejecución.\\
+
+Si se elimina un nodo intermedio, no se obtienen mejoras en la función objetivo, pero para algunos se conserva el flujo de la instancia original, así que se pudiera eliminar alguno de ellos, los mejores candidatos son 5, 8, 10 y 12 ya que son los que hacen que la distancia se resuelva más rápido. 
+
+\newpage
+\section*{Comparación de instancias}
+
+En este ultimo apartado, se comparan las características de los nodos para cada grafo, esperando poder determinar que característica pudiera parecer importante para un flujo más grande.
+
+\begin{figure}[H]
+\centering
+\subfigure[Comparación por grafo para A1]{\doublebox{\includegraphics[width=60mm]{CA_1.eps}}\hspace{2mm}}
+\subfigure[Comparación por grafo para A2]{\doublebox{\includegraphics[width=60mm]{CA_2.eps}}}
+\subfigure[Comparación por grafo para A3]{\doublebox{\includegraphics[width=60mm]{CA_3.eps}}\hspace{2mm}}
+\subfigure[Comparación por grafo para A4]{\doublebox{\includegraphics[width=60mm]{CA_4.eps}}}
+\subfigure[Comparación por grafo para A5]{\doublebox{\includegraphics[width=60mm]{CA_5.eps}}\hspace{2mm}}
+\subfigure[Comparación por grafo para A6]{\doublebox{\includegraphics[width=60mm]{CA_6.eps}}}
+
+\caption{Comparación de los valores por grafo para cada característica.} \label{f12}
+\end{figure}
+
+Recordando los valores objetivos  14.95, 8.57, 38.26, 23.25 y 18.86, así como que el número de nodos de las primeras 3 instancias son de 8 nodos y el resto de 16, para las instancias 1, 2, 3, 4 y 5, respectivamente.  \\
+
+De acuerdo a los resultados de las comparaciones de las características se obtienen las siguientes conclusiones generales:
+
+\begin{enumerate}
+
+\item Dado que  la instancia 3 fue la que mejor flujo obtuvo y la 4 fue la que le siguió pero obtuvieron buen y mal valor para el \texttt{degree\_centrality} respectivamente, no pareciera que este algoritmo influencíe en la función objetivo. 
+
+\item Si se obtiene bajo valor de \texttt{closeness\_centrality} obtiene mayor flujo, mientras que un alto valor, provoca menor flujo en el grafo.
+
+\item En el algoritmo \texttt{clustering} hay mucha interacción entre los grafos y las funciones objetivos, dicho eso, no podemos decir que haya una relación lineal entre el valor de este algoritmo presente en el grafo y la función objetivo.
+
+\item Las instancias 2 y 3 son la de menor y mayor objetivo respectivamente, pero para este algoritmo \texttt{load\_centrality} son los que mayor valor tienen, así que, pareciera que no habría una relación clara en base a esta característica. 
+
+\item En este caso, la instancia 4 obtuvo muy buen valor de \texttt{eccentricity}, pero la instancia 3 muy malo, así que parece que habría constraste en los resultados de funciones objetivos, pareciendo que no hubiera relacion.
+
+\item Para este algoritmo \texttt{pagerank} parece haber una tendencia entre que a mayor valor, menor flujo y para menor valor, mayor flujo. 
+
+\end{enumerate}
+
+Estas conclusiones se obtuvieron a partir de las instancias realizadas, si se desea mayor precisión, se puede aumentar el número de instancias y de variaciones en ellas.
+
+\newpage
+\bibliographystyle{unsrt}
+\bibliography{Tarea4Ref}
+
+\end{document}
