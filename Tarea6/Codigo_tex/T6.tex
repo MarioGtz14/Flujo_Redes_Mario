@@ -1,0 +1,196 @@
+\documentclass[12pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{listings}				
+\usepackage{url}					
+\usepackage{graphicx}		
+\usepackage[hang, small, labelfont=bf, up, textfont=it]{caption} 
+\usepackage{float}
+\usepackage{enumerate}
+\usepackage{subfigure}
+\usepackage{fancybox}
+\usepackage{float}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   
+  basicstyle=\footnotesize,        
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  commentstyle=\color{mygreen},    
+  deletekeywords={...},            
+  escapeinside={\%*}{*)},         
+  extendedchars=true,              
+  frame=single,	                   
+  keepspaces=true,                 
+  keywordstyle=\color{blue},       
+  language=Python,                 
+  numbers=left,
+  numbersep=4pt,
+  firstnumber=1,                    
+  showspaces=false,                
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  %title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\renewcommand{\lstlistingname}{Código}
+
+\setlength{\parskip}{10pt}
+\setlength{\parindent}{0pt}
+
+\setlength{\fboxrule}{1 pt}
+\setlength{\fboxsep}{.1 cm}
+
+\oddsidemargin=0cm		%Posicion izquierda para empezar
+\textwidth=16cm			%Largo del texto
+\topmargin=-0.5cm		%Para hacer para abajo
+\textheight=20cm
+
+\title{\textbf{El problema de eliminación de béisbol}}
+\author{Mario Alberto Gutiérrez Carrales \\ 1549273}
+		
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introducción}
+
+El problema de máximo flujo es un problema muy relevante dentro del campo de la optimización en redes ya que es usado como herramienta para resolver otros problemas que son más elaborados, tales como el problema de emparejamiento máximo, el problema de corte mínimo, y problemas de flujo en procesos en general. 
+
+El objetivo que se busca cumplir es modelar mediante una red una instancia del problema de eliminación de béisbol como una para el problema de flujo máximo y posteriormente resolverla utilizando una implementación para el problema de máximo flujo que la librería NetworkX ofrece.
+
+
+\section{Ambiente computacional}
+
+Las implementaciones computacionales se realizan en \textbf{\texttt{python}} \cite{Python} utilizando librerías como la ya mencionada \textbf{NetworkX} \cite{Net} que sirve para la manipulación de grafos, así como algoritmos de solución para problemas de optimización en redes y  \textbf{MatplotLib} \cite{Mat} que es empleada para la visualización de gráficos. 
+
+Los experimentos realizados en esta práctica se realizaron en una PC con un sistema operativo de 64 bits, procesador AMD A9-9410 Radeon R5, 2 núcleos + 3G con 2.90 GHz de velocidad y 12 GB de memoria RAM.
+
+\section{El problema de eliminación de béisbol}
+
+El problema de eliminación de béisbol (que también aplica para hockey y basquetbol) se popularizo en 1960 por Alan Hoffman \cite{R1,R2,R3}
+
+El problema de eliminación de béisbol se define de la siguiente manera:
+
+Dada la clasificación en una división deportiva en algún momento de la temporada, determine si un equipo ha sido eliminado matemáticamente y no tiene oportunidad de ganar su división. (No se permiten empates en los encuentros)
+
+Supóngase que se tiene la siguiente instancia del problema de eliminación de béisbol \\
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|r|r|r|r|r|r|}
+\hline
+Equipo & \multicolumn{1}{c|}{PG} & \multicolumn{1}{c|}{PR} & \multicolumn{1}{c|}{1} & \multicolumn{1}{c|}{2} & \multicolumn{1}{c|}{3} & \multicolumn{1}{c|}{4} \\ \hline
+1      & 33                       & 8                        & \multicolumn{1}{c|}{-} & 1                      & 6                      & 1                      \\ \hline
+2      & 29                       & 4                        & 1                      & \multicolumn{1}{c|}{-} & 0                      & 3                      \\ \hline
+3      & 28                       & 7                        & 6                      & 0                      & \multicolumn{1}{c|}{-} & 1                      \\ \hline
+4      & 27                       & 5                        & 1                      & 3                      & 1                      & \multicolumn{1}{c|}{-} \\ \hline
+\end{tabular}
+\end{table}
+
+Es decir, 4 equipos se están disputando el campeonato y en la tabla se tienen los partidos que han ganado hasta el momento (PG), los partidos restantes que le restan por jugar a cada equipo (PR) y la matriz de juegos pendientes entre los equipos. 
+
+Se desea saber si el equipo 2 está eliminado o no.
+
+Primero se puede observar que el número máximo de partidos ganados que puede conseguir el equipo 2 es  $PG_n(2) = 29 + 4 = 33$ (si gana todos sus juegos).
+
+Si gana todos sus juegos, no será eliminado solamente si:
+
+\begin{itemize}
+
+\item 1 no gana más de  $C(1) = PG_n(2) - PG(1) = 33 - 33 = 0$ en sus juegos restantes.
+
+\item 3 no gana más de  $C(3) = PG_n(2) - PG(3) = 33 - 28 = 5$ en sus juegos restantes.
+
+\item 4 no gana más de  $C(4) = PG_n(2) - PG(4) = 33 - 27 = 6$ en sus juegos restantes.
+
+\end{itemize}
+
+Sea $P$ el conjunto de equipos sin considerar el equipo 2 y $Q$ el conjunto de todos los posibles juegos entre los equipos en $P$.
+
+$P = \lbrace 1,3,4 \rbrace$ $Q =  \lbrace (1,3),(1,4),(3,4) \rbrace$
+
+Para crear la red se toma en cuenta las siguientes consideraciones:
+
+\begin{itemize}
+
+\item Crear un nodo fuente $O$ (Todos los juegos se originan de aquí).
+
+\item Crear un nodo por cada pareja en $Q$. Para cada nodo $(i,j)$ creado, agregar un arco de $O$ a $(i,j)$, la capacidad del arco es el número de juegos que restan por jugar entre $i$ y $j$. 
+
+\item Crear un nodo por cada equipo en $P$. Para cada nodo $(i,j) \in Q $ agregar arcos a $i$ y a $j$ cumpliendo la relación capacidad$((i,j) \rightarrow i) =  $ capacidad$((i,j) \rightarrow j) = $capacidad $(O \rightarrow (i,j))$.
+
+\item Crear un nodo sumidero $T$ (Las victorias de los equipos se registran aquí). Agregar arcos desde todo nodo $i \in P$ a T, la capacidad de arco es $C(i)$.
+
+\end{itemize}
+
+
+Encontrar el flujo máximo desde O a T en la red resultante.
+
+Si el valor de flujo máximo es igual al número total de juegos restantes entre los equipos en P entonces el equipo 2 aún tiene oportunidades de terminar como primero, sino ya está eliminado. 
+
+En este caso el número de juegos pendientes entre los equipos en P es 8, así que si el valor de flujo es menor a 8, entonces el equipo 2 está eliminado.
+
+En la figura \ref{f1} se muestran las redes que representan la instancia al problema de eliminación de béisbol y la solución a dicha instancia respectivamente. 
+
+En la red de instancia se muestran las etiquetas de las capacidades de los arcos, mientras que en la red de solución se muestra la pareja ordenada (flujo permitido, flujo usado) para cada arco. 
+
+Posteriormente se encuentran los fragmentos de código \ref{c1}, \ref{c2}, \ref{c3}, \ref{c4}, \ref{c5} y \ref{c6} en donde se muestra como se configuran los parámetros de la instancia, los nodos y las conexiones entre ellos, la grafica de la instancia, guardar una imagen en formato \textit{eps}, crear parejas y finalmente graficar la solución respectivamente.
+
+
+\begin{figure}[H]
+\centering
+\subfigure[Instancia]{\includegraphics[scale=.5]{Instancia.eps}}\label{f1_1}
+%\hspace{2mm}
+\subfigure[Solución]{\includegraphics[scale=.5]{Solucion.eps}}\label{f1_2}
+
+\caption{Instancia y solución del problema de eliminación de béisbol.} \label{f1}
+\end{figure}
+
+\vspace{.3cm}
+\captionof{lstlisting}{Parámetros de la instancia} \label{c1}
+\lstinputlisting[firstline=6, lastline=11]{Beisbol.py} 
+\vspace{.6cm}
+
+\vspace{.3cm}
+\captionof{lstlisting}{Crear conexiones} \label{c2}
+\lstinputlisting[firstline=14, lastline=27]{Beisbol.py} 
+\vspace{.6cm}
+
+\vspace{.3cm}
+\captionof{lstlisting}{Graficar la instancia} \label{c3}
+\lstinputlisting[firstline=33, lastline=36]{Beisbol.py} 
+\vspace{.6cm}
+
+\vspace{.3cm}
+\captionof{lstlisting}{Guardar imagen en formato \textit{eps}} \label{c4}
+\lstinputlisting[firstline=38, lastline=39]{Beisbol.py} 
+\vspace{.6cm}
+
+\vspace{.3cm}
+\captionof{lstlisting}{Crear parejas de flujo permitido y usado} \label{c5}
+\lstinputlisting[firstline=57, lastline=60]{Beisbol.py} 
+\vspace{.6cm}
+
+\vspace{.3cm}
+\captionof{lstlisting}{Graficar la solución} \label{c6}
+\lstinputlisting[firstline=64, lastline=67]{Beisbol.py} 
+\vspace{.6cm}
+
+En base a la solución mostrada en la subfigura b) de la figura \ref{f1} se puede identificar que el valor de flujo máximo es 7, el cual es menor que el número de juegos pendientes entre los equipos en $P$, lo que quiere decir que el equipo 2, está matemáticamente eliminado. 
+
+\newpage
+\bibliographystyle{unsrt}
+\bibliography{T6_R}
+
+\end{document}
